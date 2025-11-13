@@ -1,0 +1,4 @@
+com.gread.test.app-androidTest-0 /Users/apple/GRead-Android/app/build/generated/res/resValues/androidTest/debug
+com.gread.test.app-mergeDebugAndroidTestResources-1 /Users/apple/GRead-Android/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.gread.test.app-mergeDebugAndroidTestResources-2 /Users/apple/GRead-Android/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.gread.test.app-merged_res-3 /Users/apple/GRead-Android/app/build/intermediates/merged_res/debugAndroidTest

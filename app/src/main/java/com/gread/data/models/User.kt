@@ -5,23 +5,31 @@ import com.google.gson.annotations.SerializedName
 data class User(
     val id: Int,
     @SerializedName("user_login")
-    val username: String,
+    val username: String = "",
     @SerializedName("user_email")
-    val email: String,
+    val email: String = "",
     @SerializedName("display_name")
-    val displayName: String,
+    val displayName: String = "",
     @SerializedName("user_registered")
-    val userRegistered: String,
+    val userRegistered: String = "",
     val avatar: String = "",
     @SerializedName("xprofile")
     val profile: Map<String, Any>? = null
 )
 
 data class JWTResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val token: String? = null,
     val user: User? = null,
     val message: String? = null
+)
+
+data class LoginResponse(
+    val token: String,
+    val user_id: Int,
+    val user_email: String,
+    val user_nicename: String,
+    val user_display_name: String
 )
 
 data class UserStats(

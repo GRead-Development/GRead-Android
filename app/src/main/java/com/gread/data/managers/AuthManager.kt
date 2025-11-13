@@ -7,8 +7,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.gread.data.api.GReadApiService
 import com.gread.data.api.LoginRequest
 import com.gread.data.models.JWTResponse
+import com.gread.data.models.LoginResponse
 import com.gread.data.models.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private const val AUTH_STORE = "auth_store"
@@ -29,15 +31,51 @@ class AuthManager(
     suspend fun login(username: String, password: String): Result<JWTResponse> {
         return try {
             val response = apiService.login(LoginRequest(username, password))
-            if (response.success && response.token != null && response.user != null) {
-                context.authDataStore.edit { prefs ->
-                    prefs[TOKEN_KEY] = response.token
-                    prefs[USER_ID_KEY] = response.user.id.toString()
-                    prefs[USERNAME_KEY] = response.user.username
+            if (response.isSuccessful) {
+                val loginResponse = response.body()
+                if (loginResponse != null && loginResponse.token.isNotEmpty()) {
+                    // Convert LoginResponse to User object
+                    val user = User(
+                        id = loginResponse.user_id,
+                        username = loginResponse.user_nicename,
+                        email = loginResponse.user_email,
+                        displayName = loginResponse.user_display_name,
+                        userRegistered = "",
+                        avatar = ""
+                    )
+
+                    // Store token and user data
+                    context.authDataStore.edit { prefs ->
+                        prefs[TOKEN_KEY] = loginResponse.token
+                        prefs[USER_ID_KEY] = loginResponse.user_id.toString()
+                        prefs[USERNAME_KEY] = loginResponse.user_nicename
+                    }
+
+                    // Return JWTResponse format for consistency
+                    val jwtResponse = JWTResponse(
+                        success = true,
+                        token = loginResponse.token,
+                        user = user
+                    )
+                    Result.success(jwtResponse)
+                } else {
+                    Result.failure(Exception("No token received"))
                 }
-                Result.success(response)
             } else {
-                Result.failure(Exception(response.message ?: "Login failed"))
+                // Handle error response - try to extract error message from body
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = if (errorBody != null) {
+                    try {
+                        val errorJson = com.google.gson.Gson().fromJson(errorBody, Map::class.java)
+                        (errorJson["message"] as? String)?.replace("<strong>", "")?.replace("</strong>", "")
+                            ?: "Login failed with status ${response.code()}"
+                    } catch (e: Exception) {
+                        "Login failed with status ${response.code()}"
+                    }
+                } else {
+                    "Login failed with status ${response.code()}"
+                }
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -49,7 +87,11 @@ class AuthManager(
     }
 
     suspend fun getToken(): String? {
-        return context.authDataStore.data.map { it[TOKEN_KEY] }.map { it }.firstOrNull()
+        return try {
+            context.authDataStore.data.first()[TOKEN_KEY]
+        } catch (e: Exception) {
+            null
+        }
     }
 
     suspend fun isLoggedIn(): Boolean = getToken() != null

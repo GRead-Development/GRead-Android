@@ -2,20 +2,21 @@ package com.gread.data.api
 
 import com.gread.data.models.*
 import retrofit2.http.*
+import retrofit2.Response
 
 interface GReadApiService {
     // Auth
     @POST("jwt-auth/v1/token")
-    suspend fun login(@Body request: LoginRequest): JWTResponse
+    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
     @POST("wp/v2/users/register")
     suspend fun register(@Body request: RegisterRequest): User
 
     // User
-    @GET("buddypress/v1/members/{id}")
+    @GET("gread/v1/members/{id}")
     suspend fun getUser(@Path("id") userId: Int): User
 
-    @GET("buddypress/v1/members/{id}/profile")
+    @GET("gread/v1/members/{id}/xprofile")
     suspend fun getUserStats(@Path("id") userId: Int): UserStats
 
     // Library
@@ -33,7 +34,7 @@ interface GReadApiService {
 
     // Activity
     @GET("gread/v1/activity")
-    suspend fun getActivityFeed(@Query("page") page: Int = 1, @Query("per_page") perPage: Int = 20): ActivityFeed
+    suspend fun getActivityFeed(@Query("page") page: Int = 1, @Query("per_page") perPage: Int = 20): APIListResponse<Activity>
 
     // Search
     @GET("gread/v1/books/search")
@@ -59,7 +60,7 @@ interface GReadApiService {
     suspend fun getMutedUsers(): List<User>
 
     // Groups
-    @GET("buddypress/v1/groups")
+    @GET("gread/v1/groups")
     suspend fun getGroups(@Query("page") page: Int = 1, @Query("per_page") perPage: Int = 20): APIListResponse<Group>
 }
 

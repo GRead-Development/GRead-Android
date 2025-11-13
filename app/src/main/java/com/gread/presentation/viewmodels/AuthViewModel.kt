@@ -19,6 +19,17 @@ class AuthViewModel(private val authManager: AuthManager) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState
 
+    init {
+        viewModelScope.launch {
+            // Check if user is already logged in
+            val token = authManager.getToken()
+            if (token != null) {
+                // User has a stored token, mark as logged in
+                _uiState.value = AuthUiState(isLoggedIn = true)
+            }
+        }
+    }
+
     fun login(username: String, password: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)

@@ -1,7 +1,8 @@
 package com.gread.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkMode
-import androidx.compose.material3.*
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -27,14 +28,14 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun GReadTheme(
-    darkTheme: Boolean = isSystemInDarkMode(),
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography(),
+        typography = AppTypography,
         content = content
     )
 }

@@ -1,12 +1,14 @@
 package com.gread.ui.screens
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LibraryBooks
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,14 +16,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gread.presentation.viewmodels.ActivityViewModel
 import com.gread.presentation.viewmodels.AuthViewModel
-import com.gread.presentation.viewmodels.GroupsViewModel
 import com.gread.presentation.viewmodels.LibraryViewModel
 import com.gread.presentation.viewmodels.UserViewModel
 
 enum class TabRoute(val icon: ImageVector, val label: String) {
     ACTIVITY(Icons.Filled.Home, "Activity"),
-    LIBRARY(Icons.Filled.LibraryBooks, "Library"),
-    GROUPS(Icons.Filled.People, "Groups"),
+    LIBRARY(Icons.Filled.ShoppingCart, "Library"),
     PROFILE(Icons.Filled.Person, "Profile")
 }
 
@@ -30,7 +30,6 @@ fun MainTabScreen(
     authViewModel: AuthViewModel,
     libraryViewModel: LibraryViewModel,
     activityViewModel: ActivityViewModel,
-    groupsViewModel: GroupsViewModel,
     userViewModel: UserViewModel,
     userId: Int,
     onLogout: () -> Unit
@@ -64,16 +63,13 @@ fun MainTabScreen(
         NavHost(
             navController = tabNavController,
             startDestination = TabRoute.ACTIVITY.name,
-            modifier = androidx.compose.foundation.layout.Modifier.weight(1f)
+            modifier = Modifier.padding(padding)
         ) {
             composable(TabRoute.ACTIVITY.name) {
                 ActivityFeedScreen(activityViewModel)
             }
             composable(TabRoute.LIBRARY.name) {
                 LibraryScreen(libraryViewModel)
-            }
-            composable(TabRoute.GROUPS.name) {
-                GroupsScreen(groupsViewModel)
             }
             composable(TabRoute.PROFILE.name) {
                 ProfileScreen(

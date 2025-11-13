@@ -9,17 +9,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gread.data.api.GReadApiService
+import com.gread.data.api.AuthInterceptor
 import com.gread.data.managers.AuthManager
 import com.gread.presentation.viewmodels.*
 import com.gread.ui.screens.LoginScreen
 import com.gread.ui.screens.MainTabScreen
 import com.gread.ui.theme.GReadTheme
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -27,8 +31,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(this))
+            .build()
+
         val retrofit = Retrofit.Builder()
             .baseUrl("https://gread.fun/wp-json/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -37,7 +46,6 @@ class MainActivity : ComponentActivity() {
         val authViewModel = AuthViewModel(authManager)
         val libraryViewModel = LibraryViewModel(apiService)
         val activityViewModel = ActivityViewModel(apiService)
-        val groupsViewModel = GroupsViewModel(apiService)
         val userViewModel = UserViewModel(apiService)
 
         setContent {
@@ -53,7 +61,6 @@ class MainActivity : ComponentActivity() {
                         authViewModel = authViewModel,
                         libraryViewModel = libraryViewModel,
                         activityViewModel = activityViewModel,
-                        groupsViewModel = groupsViewModel,
                         userViewModel = userViewModel
                     )
                 }
@@ -69,7 +76,6 @@ fun GReadNavHost(
     authViewModel: AuthViewModel,
     libraryViewModel: LibraryViewModel,
     activityViewModel: ActivityViewModel,
-    groupsViewModel: GroupsViewModel,
     userViewModel: UserViewModel
 ) {
     val userId by authViewModel.uiState.collectAsState().value.user?.id?.toString()?.let { remember { androidx.compose.runtime.mutableStateOf(it.toInt()) } } ?: remember { androidx.compose.runtime.mutableStateOf(0) }
@@ -91,7 +97,6 @@ fun GReadNavHost(
                 authViewModel = authViewModel,
                 libraryViewModel = libraryViewModel,
                 activityViewModel = activityViewModel,
-                groupsViewModel = groupsViewModel,
                 userViewModel = userViewModel,
                 userId = currentUserId,
                 onLogout = {

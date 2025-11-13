@@ -3,6 +3,7 @@ package com.gread.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -61,16 +62,19 @@ fun ProfileScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                val displayName = uiState.user!!.displayName.ifBlank { uiState.user!!.username }
                 Text(
-                    uiState.user!!.displayName,
+                    displayName,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                Text(
-                    "@${uiState.user!!.username}",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                if (uiState.user!!.username.isNotBlank()) {
+                    Text(
+                        "@${uiState.user!!.username}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -114,9 +118,3 @@ fun StatCard(label: String, value: String) {
     }
 }
 
-@Composable
-private fun LaunchedEffect(key: Any?, block: suspend () -> Unit) {
-    androidx.compose.runtime.LaunchedEffect(key) {
-        block()
-    }
-}

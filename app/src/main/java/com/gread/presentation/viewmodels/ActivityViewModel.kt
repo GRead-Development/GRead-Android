@@ -29,14 +29,15 @@ class ActivityViewModel(private val apiService: GReadApiService) : ViewModel() {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val feed = apiService.getActivityFeed(page = page)
-                val newActivities = if (page == 1) feed.activities else {
-                    (_uiState.value.activities + feed.activities)
+                val items = feed.items ?: emptyList()
+                val newActivities = if (page == 1) items else {
+                    (_uiState.value.activities + items)
                 }
                 _uiState.value = ActivityUiState(
                     activities = newActivities,
                     isLoading = false,
                     page = page,
-                    hasMore = feed.total > newActivities.size
+                    hasMore = (feed.total ?: 0) > newActivities.size
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
